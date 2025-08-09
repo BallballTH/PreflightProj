@@ -117,7 +117,7 @@ app.post(
         .json({ status: "fail", message: "Invalid credentials" });
     }
 
-    res.json({ uuid: found.uid });
+    res.json({ uuid: found.uid, name: found.name });
   })
 );
 
