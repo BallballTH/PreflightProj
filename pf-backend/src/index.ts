@@ -83,13 +83,23 @@ app.patch("/buy", catchAsync(async (req: Request, res: Response) => {
   if (!uuid || item_id === undefined) {
     return res.status(400).json({ status: 'fail', message: 'User UUID and item_id are required' });
   }
-
+  //ensure buyer exists
+  const buyer = await dbClient.query.user.findFirst({ where: eq(user.uid, uuid) });
+  if (!buyer) {
+    return res.status(404).json({ status: 'fail', message: 'Buyer not found' });
+  }
+  //ensure item exists
   const target = await dbClient.query.item.findFirst({ where: eq(item.id, item_id) });
   if (!target) {
     return res.status(404).json({ status: 'fail', message: 'Item not found' });
   }
+  //prevent buying own item
   if (target.seller === uuid) {
     return res.status(403).json({ status: 'fail', message: 'You cannot buy your own item' });
+  }
+  //(optional hardening) prevent double purchase / inactive
+  if (target.is_purchased || !target.is_active) {
+    return res.status(409).json({ status: 'fail', message: 'Item is not available for purchase' });
   }
 
   const updated = await dbClient.update(item).set({
@@ -188,6 +198,8 @@ app.get("/", catchAsync(async (_req: Request, res: Response) => {
   const items = await dbClient.query.item.findMany();
   res.json(items );
 }));
+
+
 
 /* ----------------------------
    Global Error Handler
