@@ -124,46 +124,37 @@ app.post(
 /* ----------------------------
    buy item
 ----------------------------- */
-app.patch(
-  "/buy",
-  catchAsync(async (req: Request, res: Response) => {
-    const { uuid, item_id } = req.body;
-    if (!uuid || item_id === undefined) {
-      return res.status(400).json({
-        status: "fail",
-        message: "User UUID and item_id are required",
-      });
-    }
 
-    const target = await dbClient.query.item.findFirst({
-      where: eq(item.id, item_id),
-    });
-    if (!target) {
-      return res
-        .status(404)
-        .json({ status: "fail", message: "Item not found" });
-    }
-    if (target.seller === uuid) {
-      return res
-        .status(403)
-        .json({ status: "fail", message: "You cannot buy your own item" });
-    }
+app.patch("/buy", catchAsync(async (req: Request, res: Response) => {
+  const { uuid, item_id } = req.body;
+  if (!uuid || item_id === undefined) {
+    return res.status(400).json({ status: 'fail', message: 'User UUID and item_id are required' });
+  }
+  //ensure buyer exists
+  const buyer = await dbClient.query.user.findFirst({ where: eq(user.uid, uuid) });
+  if (!buyer) {
+    return res.status(404).json({ status: 'fail', message: 'Buyer not found' });
+  }
+  //ensure item exists
+  const target = await dbClient.query.item.findFirst({ where: eq(item.id, item_id) });
+  if (!target) {
+    return res.status(404).json({ status: 'fail', message: 'Item not found' });
+  }
+  //prevent buying own item
+  if (target.seller === uuid) {
+    return res.status(403).json({ status: 'fail', message: 'You cannot buy your own item' });
+  }
 
-    const updated = await dbClient
-      .update(item)
-      .set({
-        customer: uuid,
-        is_purchased: true,
-        is_active: false,
-        status: 0,
-        updatedAt: new Date(),
-      })
-      .where(eq(item.id, item_id))
-      .returning();
+  const updated = await dbClient.update(item).set({
+    customer: uuid,
+    is_purchased: true,
+    is_active: false,
+    status: 0,
+    updatedAt: new Date(),
+  }).where(eq(item.id, item_id)).returning();
 
-    res.json({ status: "success", msg: "Item purchased", data: updated });
-  })
-);
+  res.json({ status: 'success', msg: 'Item purchased', data: updated });
+}));
 
 /* ----------------------------
    create item for sale
@@ -344,6 +335,8 @@ app.get(
     }
   })
 );
+
+
 
 /* ----------------------------
    Global Error Handler
