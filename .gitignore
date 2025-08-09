@@ -1,0 +1,8 @@
+pf-test/node_modules
+pf-test/.env
+
+pf-db/node_modules
+pf-db/.env
+
+pf-backend/node_modules
+pf-backend/.env
