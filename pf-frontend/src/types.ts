@@ -1,7 +1,13 @@
 export interface item {
   id: string;
-  todoText: string;
-  isDone: boolean;
+  seller: string;
+  customer: string;
+  name: string;
+  detail: string;
+  image: string;
+  is_purchased: boolean;
+  is_active: boolean;
+  status: number;
   createdAt: string;
   updatedAt: string;
 }

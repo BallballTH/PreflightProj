@@ -1,31 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import { type item } from "../types";
+import axios from "axios";
+import dayjs from "dayjs";
 
 function Marketplace() {
-  const [items, setItems] = useState([
-    {
-      id: 1,
-      name: "Raffan",
-      detail: "A beautiful handsome gentleman.",
-      image:
-        "https://scontent.fcnx1-1.fna.fbcdn.net/v/t39.30808-1/338020354_226709259894491_5132916288736129825_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=111&ccb=1-7&_nc_sid=e99d92&_nc_eui2=AeE1xg1XZVjBYkreVQotRiYslGVO4DnlRbeUZU7gOeVFt_4U7m1oO2IRcZcBDJeMJPOCswzPd1jhvQsNuO_6DIfA&_nc_ohc=NGIuQH7Mo7EQ7kNvwFN0RE6&_nc_oc=AdnCYQ5d6sbaz75qCmKnTfuk7rtmlsW96ivZ9ibJE4y3RUZUZI67r9EAP7sffnubQcI&_nc_zt=24&_nc_ht=scontent.fcnx1-1.fna&_nc_gid=Bvvp5DK4yQBmtInuXICJsg&oh=00_AfW7EyYk0baALTNpBodAirq776MWbrzj3nfLiy__Z8w8NA&oe=689940E6",
-      status: 1,
-      is_purchased: false,
-      is_active: true,
-      seller: 1,
-    },
-    {
-      id: 2,
-      name: "Vintage Lamp",
-      detail: "Classic vintage lamp from the 70s.",
-      image: "https://picsum.photos/300/200?random=2",
-      status: 1,
-      is_purchased: true,
-      is_active: true,
-      seller: 1,
-    },
-  ]);
+  const [items, setItems] = useState<item[]>([]);
+
+  async function fetchData() {
+    const res = await axios.get<item[]>("api/items");
+    setItems(res.data);
+  }
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   interface FormDataType {
+    userId: string; // 👈 อาจจะใช้เพื่อเก็บ user ID ถ้าต้องการ
     name: string;
     detail: string;
     status: number;
@@ -33,6 +25,7 @@ function Marketplace() {
   }
 
   const [form, setForm] = useState<FormDataType>({
+    userId: sessionStorage.getItem("userId") || "",
     name: "",
     detail: "",
     image: "",
@@ -43,12 +36,13 @@ function Marketplace() {
     e.preventDefault();
 
     const formData = new FormData();
+    formData.append("userId", form.userId);
     formData.append("image", form.image); // รูปภาพ
     formData.append("name", form.name);
     formData.append("detail", form.detail);
     formData.append("status", form.status.toString());
 
-    const res = await fetch("api/item", {
+    const res = await fetch("api/sell", {
       method: "post",
       body: formData,
     });
@@ -56,6 +50,8 @@ function Marketplace() {
     const data = await res.json();
     console.log("Posted item:", data);
     alert("Item posted successfully!");
+
+    fetchData();
   };
 
   return (
@@ -126,27 +122,73 @@ function Marketplace() {
           gap: "1rem",
         }}
       >
-        {items.map((item) => (
-          <article key={item.id}>
-            <img
-              src={item.image}
-              alt={item.name}
-              style={{ height: "200px", objectFit: "cover", width: "100%" }}
-            />
-            <h3>{item.name}</h3>
-            <p>{item.detail}</p>
-            <p>
-              <strong>Status:</strong>{" "}
-              {item.is_purchased ? "Sold" : "Available"}
-            </p>
-            <button disabled={item.is_purchased}>
-              {item.is_purchased ? "Sold Out" : "Buy"}
-            </button>
-          </article>
-        ))}
+        {items.sort(compareDate).map((item: item) => {
+          const { date: dateC, time: timeC } = formatDateTime(item.createdAt);
+          const { date: dateU, time: timeU } = formatDateTime(item.updatedAt);
+          return (
+            <article key={item.id}>
+              <img
+                src={item.image}
+                alt={item.name}
+                style={{ height: "200px", objectFit: "cover", width: "100%" }}
+              />
+              <h3>{item.name}</h3>
+              <p>{item.detail}</p>
+              <p>
+                <strong>Status:</strong>{" "}
+                {item.is_purchased
+                  ? "Sold"
+                  : item.status === 1
+                  ? "Available"
+                  : item.status === 0
+                  ? "Inactive"
+                  : item.status === 2
+                  ? "Reserved"
+                  : "Unknown"}
+              </p>
+
+              <p>
+                <strong>Seller:</strong> {item.seller || "-"}
+              </p>
+              <p>
+                <strong>Customer:</strong> {item.customer || "-"}
+              </p>
+              <p>
+                <strong>
+                  Created At: {dateC} {timeC}
+                </strong>
+              </p>
+              <p>
+                <strong>
+                  Updated At: {dateU} {timeU}
+                </strong>
+              </p>
+
+              <button disabled={item.is_purchased}>
+                {item.is_purchased ? "Sold Out" : "Buy"}
+              </button>
+            </article>
+          );
+        })}
       </div>
     </main>
   );
+}
+
+function formatDateTime(dateStr: string) {
+  if (!dayjs(dateStr).isValid()) {
+    return { date: "N/A", time: "N/A" };
+  }
+  const dt = dayjs(dateStr);
+  const date = dt.format("D/MM/YY");
+  const time = dt.format("HH:mm");
+  return { date, time };
+}
+
+function compareDate(a: item, b: item) {
+  const da = dayjs(a.createdAt);
+  const db = dayjs(b.createdAt);
+  return da.isBefore(db) ? -1 : 1;
 }
 
 export default Marketplace;

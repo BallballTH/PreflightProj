@@ -5,6 +5,9 @@
 - Make `.npmrc` from `.npmrc.example` (adjust your shell accordingly)
 - `pnpm install`
 - `pnpm run dev`
+- `pnpm install cloudinary`
+- `pnpm install multer`
+- `pnpm add -D @types/multer`
 
 # Setup from scratch
 
