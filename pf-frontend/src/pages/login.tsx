@@ -16,6 +16,7 @@ function Login() {
       .then((res) => {
         sessionStorage.setItem("isLoggedIn", "yes");
         sessionStorage.setItem("userId", res.data.uuid);
+        sessionStorage.setItem("userName", res.data.name);
 
         navigate("/marketplace");
         window.location.reload();
