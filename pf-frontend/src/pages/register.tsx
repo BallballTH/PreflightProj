@@ -1,24 +1,24 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
 import axios from "axios";
 
-function Login() {
-  const [username, setUsername] = useState("");
+function Register() {
+  const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
+
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     axios
-      .post("/api/login", { username, password })
+      .request({
+        url: "/api/register",
+        method: "post",
+        data: { username: user, password: password },
+      })
       .then((res) => {
-        sessionStorage.setItem("isLoggedIn", "yes");
-        sessionStorage.setItem("userId", res.data.uuid);
-
-        navigate("/marketplace");
-        window.location.reload();
+        alert(res.data.message);
+        navigate("/login");
       })
       .catch((err) => {
         console.error(err);
@@ -29,15 +29,15 @@ function Login() {
   return (
     <main className="login-container">
       <article>
-        <h1 style={{ textAlign: "center" }}>Login</h1>
-        <form onSubmit={handleLogin}>
+        <h1 style={{ textAlign: "center" }}>Register</h1>
+        <form onSubmit={handleRegister}>
           <label>
             Username
             <input
               type="text"
               placeholder="Enter your username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={user}
+              onChange={(e) => setUser(e.target.value)}
               required
             />
           </label>
@@ -54,15 +54,12 @@ function Login() {
           </label>
 
           <button type="submit" style={{ width: "100%" }}>
-            Log In
+            Register
           </button>
         </form>
-        <p>
-          Don't have an account? <Link to="/register">Register here</Link>
-        </p>
       </article>
     </main>
   );
 }
 
-export default Login;
+export default Register;
