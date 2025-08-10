@@ -336,7 +336,20 @@ app.get(
   })
 );
 
-
+/*
+secret api to delete user after test
+*/
+app.delete("/kill/user", catchAsync(async (req: Request, res: Response) => {
+  const { uuid , secret } = req.body;
+  if (!uuid || secret !== "1234") { // ควรใช้ env แทน
+    return res.status(400).json({ status: 'fail', message: 'UUID and secret key are required' });
+  }
+  const existing = await dbClient.query.user.findFirst({ where: eq(user.uid, uuid) });
+  if (!existing) {
+    return res.status(404).json({ status: 'fail', message: 'User not found' });
+  }
+  await dbClient.delete(user).where(eq(user.uid, uuid));
+}));
 
 /* ----------------------------
    Global Error Handler
