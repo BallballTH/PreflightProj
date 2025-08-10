@@ -22,3 +22,12 @@
 
 - `docker tag preflight-backend [DOCKERHUB_ACCOUNT]/preflight-backend:latest`
 - `docker push [DOCKERHUB_ACCOUNT]/preflight-backend:latest`
+
+# API Spece
+-`/login → เข้าสู่ระบบ (สำเร็จ, ขาดข้อมูล, รหัสผิด/ไม่พบ)`
+-`/buy → ซื้อสินค้า (สำเร็จ, ขาดข้อมูล, ไม่พบผู้ซื้อ/สินค้า, ซื้อของตัวเอง)`
+-`/sell (POST) → ลงขาย (สำเร็จ, ขาดข้อมูล, ไม่มีรูป, ผิดพลาด)`
+-`/sell (PATCH) → แก้ไข (สำเร็จ, ขาดข้อมูล, ไม่ใช่เจ้าของ, วันที่ไม่ถูกต้อง)`
+-`/sell (DELETE) → ลบสินค้า (สำเร็จ, ขาดข้อมูล, ไม่ใช่เจ้าของ)`
+-`/items → ดูสินค้าทั้งหมด (สำเร็จ, ผิดพลาด)`
+-`/kill/user → ลบผู้ใช้ (สำเร็จ, ขาดข้อมูล, secret ไม่ตรง, ไม่พบ)`
