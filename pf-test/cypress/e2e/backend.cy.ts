@@ -1,5 +1,3 @@
-// cypress/e2e/marketplace.cy.ts
-
 const apiUrl = Cypress.env('BACKEND_URL') || 'http://localhost:3000';
 
 let sellerUuid: string;
