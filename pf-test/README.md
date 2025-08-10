@@ -1,5 +1,8 @@
 ```
-pnpm install
+npm init es6
+
+pnpm install cypress typescript dotenv @tsconfig/node-lts @tsconfig/node-ts
+@types/node
 
 npx cypress install 
 
