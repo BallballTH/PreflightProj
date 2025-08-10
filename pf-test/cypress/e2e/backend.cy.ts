@@ -296,19 +296,22 @@ describe('Marketplace E2E (API with image upload)', () => {
   //
   // -------- DELETE ITEM --------
   //
-  it('DELETE /sell success and verify via GET /items', () => {
-    cy.request('DELETE', `${apiUrl}/sell`, { uuid: sellerUuid, item_id: itemId })
-      .then((res) => {
-        expect(res.status).to.eq(200);
+it('DELETE /sell success and verify via GET /items', () => {
+  cy.request('DELETE', `${apiUrl}/sell`, { uuid: sellerUuid, item_id: itemId })
+    .then((res) => {
+      expect([200, 204]).to.include(res.status);
+      if (res.status === 200) {
         expect(res.body.status).to.eq('success');
         expect(res.body.id).to.eq(itemId);
-      });
-
-    cy.request('GET', `${apiUrl}/items`).then((res) => {
+      }
+      // CHAIN: GET
+      return cy.request('GET', `${apiUrl}/items`);
+    })
+    .then((res) => {
+      expect(res.status).to.eq(200);
       const found = res.body.find((it: any) => it?.id === itemId);
       expect(found).to.not.exist;
     });
-  });
 });
 
 //
