@@ -24,7 +24,7 @@
   },
   "contributors": [],
   "scripts": {
-      "test": "cypress open"
+    "test": "cypress open"
   },
   "dependencies": {
     "@tsconfig/node-lts": "^22.0.2",
@@ -33,5 +33,11 @@
     "cypress": "^14.5.3",
     "dotenv": "^17.2.1",
     "typescript": "^5.9.2"
+  },
+  "devDependencies": {
+    "@types/form-data": "^2.5.2",
+    "@types/node-fetch": "^2.6.13",
+    "form-data": "^4.0.4",
+    "node-fetch": "^2.7.0"
   }
 }
