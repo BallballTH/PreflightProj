@@ -1,12 +1,12 @@
-name: preflight # You can also change this to another name to avoid warning with existing group.
+name: a1 # You can also change this to another name to avoid warning with existing group.
 services:
   backend:
-    container_name: pf-backend
+    container_name: A1-backend
     build: .
     ports:
       - ${PORT}:3000
     networks:
-      - preflight_pf-net
+      - pf-net
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_PORT=${POSTGRES_PORT}
@@ -23,5 +23,4 @@ services:
             'npm run db:migrate | awk ''{ print strftime("[%Y-%m-%d %H:%M:%S]"), $0; fflush(); }'' | tee -a /app/logs/migration.log',
           ]
 networks:
-  preflight_pf-net: # Check by using `docker network ls` command
-    external: true
+  pf-net: # Check by using `docker network ls` comman

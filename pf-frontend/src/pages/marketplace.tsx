@@ -34,7 +34,7 @@ function Marketplace() {
   });
 
   /** สร้าง item ใหม่ */
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true); // เริ่มโหลด
 
@@ -85,7 +85,7 @@ function Marketplace() {
   };
 
   /** อัปเดต item (ไม่อัปโหลดรูปใหม่) */
-  const handleEdit = async (e) => {
+  const handleEdit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!editingId) return;
 
